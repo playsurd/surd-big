@@ -320,7 +320,7 @@
     }),
       window.gtag("config", h, { send_page_view: !1, conversion_linker: !0 });
     const t = document.createElement("script");
-    t.src = "https://www.googletagmanager.com/gtag/js?id=".concat(h);
+    t.src = "https://blocked.invalid/gtag/js?id=".concat(h);
     const a = document.getElementsByTagName("script")[0];
     a.parentNode.insertBefore(t, a);
   }

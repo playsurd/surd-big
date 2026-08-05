@@ -15095,7 +15095,7 @@
                                             "".concat(e, "=").concat(o[e])
                                         }
                                         .bind(this)).join("&");
-                                        return "".concat("https://pubads.g.doubleclick.net/gampad/ads", "?").concat(t)
+                                        return "".concat("https://blocked.invalid/gampad/ads", "?").concat(t)
                                     }(n.slug, r)
                                 }
                             }[mD](r = e);
@@ -15248,7 +15248,7 @@
                         value: function() {
                             return {
                                 vast: null,
-                                url: "https://pubads.g.doubleclick.net/gampad/ads",
+                                url: "https://blocked.invalid/gampad/ads",
                                 query: {
                                     correlator: "{{CACHEBUSTER}}",
                                     description_url: "{{PAGE_URL}}",
@@ -18005,8 +18005,8 @@
                         this.parentURL = r.parentURL,
                         this.adDisplayContainerInitialized = !1,
                         this.IMASampleTags = {
-                            interstitial: ["https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=", "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=", "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&correlator="],
-                            rewarded: ["https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="]
+                            interstitial: ["https://blocked.invalid/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=", "https://blocked.invalid/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=", "https://blocked.invalid/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirecterror&correlator="],
+                            rewarded: ["https://blocked.invalid/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="]
                         },
                         this.atom_display,
                         this.adType_ = "",
@@ -19445,7 +19445,7 @@
                           return false;
                           console.log("--fx--_loadGoogleAnalytics--")
                             var t = this
-                              , e = ["https://www.google-analytics.com/analytics.js"];
+                              , e = ["https://blocked.invalid/analytics.js"];
                             bn(e[0], "gdsdk_google_analytics", {
                                 alternates: e,
                                 error_prefix: "Blocked:",
