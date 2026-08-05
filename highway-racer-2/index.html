@@ -1,4 +1,216 @@
 <!doctype html><html><head><meta charset="utf-8"><title>highway-racer-2</title></head><body>
-<script>window.SURD_GAME = {"id":"highway-racer-2","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/highway-racer-2/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v22896bd64c/","files":{"data":{"path":"_vendor/game.data.unityweb","parts":[".sp0",".sp1",".sp2"],"mime":"application/octet-stream"},"framework":{"path":"_vendor/game.framework.js.unityweb"},"code":{"path":"_vendor/game.wasm.unityweb"}},"config":{"era":"modern","loaderJs":"_vendor/game.loader.js","companyName":"FreezeNova","productName":"Crazy Drifter","productVersion":"0.1"}};</script>
-<script src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v22896bd64c/runtime.js"></script>
+<div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
+<script>
+         !function(e,t){a=e.createElement("script"),m=e.getElementsByTagName("script")[0],a.async=1,a.src=t,m.parentNode.insertBefore(a,m)}(document,"https://universal.wgplayer.com/tag/?lh="+window.location.hostname+"&wp="+window.location.pathname+"&ws="+window.location.search);
+      </script>
+<script>
+         function SubmitLeaderboardScore(newScore){}
+         function GetLeaderboardEntries(){}
+         
+         function InitApi(_appId) 
+            {
+         	var dateNow = new Date();
+         	var secondsSinceEpoch = Math.round(dateNow.getTime() / 1000);
+         	
+         	console.log('InitApi');
+         	
+         	window.callTime = secondsSinceEpoch - 121;
+            }
+         
+         function InitExternEval(_appId) 
+            {
+         	console.log("InitExternEval");
+         	
+         	ExternEval();
+            }
+            
+            function ExternEval() 
+            {
+         	console.log("ExternEval");
+         	
+         	var dateNow = new Date();
+         	var secondsSinceEpoch = Math.round(dateNow.getTime() / 1000);
+         	
+         	if (window.callTime != undefined && 
+         		secondsSinceEpoch - window.callTime > 120)
+         	{
+         		console.log('ExternEval 2');
+         		
+         		window.callTime = secondsSinceEpoch;
+         		
+         		if (typeof preroll !== 'undefined')
+         		{
+         			if (window[preroll.config.loaderObjectName] != undefined)
+         			{
+         				gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'onOpen');
+         			
+         				try {
+         					window[preroll.config.loaderObjectName].refetchAd(ExternEvalResumeGame);
+         				}
+         				catch(err) {
+         					console.log(err.message);
+         					gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'onClose');
+         				}
+         			}
+         		}
+         	}
+         	
+            }
+         
+         function ExternEvalResumeGame()
+         {
+         	console.log("ExternEvalResumeGame");
+         
+         	gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'onClose');
+         }
+         
+         function PreloadRewarded() 
+         {
+         	console.log("PreloadRewarded");
+         
+         	if (window.rewardedCallbacks == undefined)
+         	{
+         		window.rewardedCallbacks = true;
+         		
+         		try {
+         			window[window.preroll.config.loaderObjectName].registerRewardCallbacks({
+         				onReady:RewardedReady, 
+         				onSuccess:RewardedSuccess, 
+         				onFail:RewardedFail,
+         				onClose:RewardedClose
+         			});
+         		}
+         		catch(err) {
+         			console.log(err.message);
+         		}
+         	}
+         }
+         	
+         function ShowRewarded() 
+         {
+         	console.log("ShowRewarded");
+         
+         	if (typeof preroll !== 'undefined')
+         	{
+         		if (window.rewardedCallbacks == undefined)
+         		{
+         			PreloadRewarded();
+         		}
+         	
+         		if (window[preroll.config.loaderObjectName] != undefined)
+         		{
+         			gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'onOpen');
+         		
+         			try {
+         				window[preroll.config.loaderObjectName].showRewardAd();
+         			}
+         			catch(err) {
+         				console.log(err.message);
+         				gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'onClose');
+         			}
+         		}
+         	}
+         
+         }
+         
+         function RewardedReady()
+         {
+         	console.log("RewardedReady");
+         	
+         	if (window.rewardedCount == undefined)
+         	{
+         		window.rewardedCount = 1;
+         		window.gameInstance.SendMessage('FreezeNovaAPI', 'RewardedReady');
+         	}
+         	else{
+         		window.rewardedCount = window.rewardedCount + 1;
+         		//setTimeout(function(){ window.gameInstance.SendMessage('FreezeNovaAPI', 'RewardedReady'); }, 30000);
+         		window.gameInstance.SendMessage('FreezeNovaAPI', 'RewardedReady');
+         	}
+         	
+         }
+         
+         function RewardedSuccess()
+         {
+         	console.log("RewardedSuccess");
+         	gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'RewardedOnRewarded');
+         	//gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'onClose');
+         }
+         
+         function RewardedFail()
+         {
+         	console.log("RewardedFail");
+         	gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'RewardedOnFail');
+         	//gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'onClose');
+         }
+         
+         function RewardedClose()
+         {
+         	console.log("RewardedClose");
+         	gameInstance.SendMessage('FreezeNovaAPI', 'AdMessage', 'onClose');
+         }
+         
+         InitApi(0);
+         
+         
+      </script>
+<script>window.__surdBoot={cui:window.createUnityInstance,ul:window.UnityLoader,en:window.Engine};window.createUnityInstance=function(){return new Promise(function(){})};window.UnityLoader={instantiate:function(){}};window.Engine=function(){};window.godotRunStart=function(){};</script><script>
+            var canvas = document.querySelector("#unity-canvas");
+            var config = {
+            	dataUrl: "./_vendor/game.data.unityweb",
+            	frameworkUrl: "./_vendor/game.framework.js.unityweb",
+            	codeUrl: "./_vendor/game.wasm.unityweb",
+            	streamingAssetsUrl: "StreamingAssets",
+            	companyName: "FreezeNova",
+            	productName: "Crazy Drifter",
+            	productVersion: "0.1",
+            };
+            var scaleToFit;
+            try {
+            	scaleToFit = !!JSON.parse("true");
+            } catch (e) {
+            	scaleToFit = true;
+            }
+            function progressHandler(progress) {
+            	var percent = progress * 100 + '%';
+            	canvas.style.background = 'linear-gradient(to right, white, white ' + percent + ', transparent ' + percent + ', transparent) no-repeat center';
+            	canvas.style.backgroundSize = '100% 1rem';
+            }
+            function onResize() {
+            	var container = canvas.parentElement;
+            	var w;
+            	var h;
+            
+            	if (scaleToFit) {
+            		w = window.innerWidth;
+            		h = window.innerHeight;
+            
+            		var r = 540 / 960;
+            
+            		if (w * r > window.innerHeight) {
+            			w = Math.min(w, Math.ceil(h / r));
+            		}
+            		h = Math.floor(w * r);
+            	} else {
+            		w = 960;
+            		h = 540;
+            	}
+            
+            	container.style.width = canvas.style.width = w + "px";
+            	container.style.height = canvas.style.height = h + "px";
+            	container.style.top = Math.floor((window.innerHeight - h) / 2) + "px";
+            	container.style.left = Math.floor((window.innerWidth - w) / 2) + "px";
+            }
+            var gameInstance;
+            createUnityInstance(canvas, config, progressHandler).then(function (instance) {
+            	canvas = instance.Module.canvas;
+            	onResize();
+            	gameInstance = instance;
+            });
+            window.addEventListener('resize', onResize);
+            onResize();
+         </script><script>window.createUnityInstance=window.__surdBoot.cui;window.UnityLoader=window.__surdBoot.ul;window.Engine=window.__surdBoot.en;delete window.godotRunStart;</script>
+
+<script>window.SURD_GAME = {"id":"highway-racer-2","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/highway-racer-2/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v2f29c73163/","files":{"data":{"path":"_vendor/game.data.unityweb","parts":[".sp0",".sp1",".sp2"],"bytes":44517714,"mime":"application/octet-stream"},"framework":{"path":"_vendor/game.framework.js.unityweb"},"code":{"path":"_vendor/game.wasm.unityweb"}},"config":{"era":"modern","loaderJs":"_vendor/game.loader.js","companyName":"FreezeNova","productName":"Crazy Drifter","productVersion":"0.1"}};</script>
+<script src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v2f29c73163/runtime.js"></script>
 </body></html>
