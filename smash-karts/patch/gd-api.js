@@ -2385,7 +2385,7 @@
                     function Yn(e) {
                         le(this, Yn),
                         this._config = e || {},
-                        this._url = e.url || "https://msgrt.gamedistribution.com/collect",
+                        this._url = e.url || "https://removed.invalid/collect",
                         this._topic_counter = {},
                         this._ua = (new Nr).getResult(),
                         this._init_layout()
@@ -12910,9 +12910,9 @@
                                         .bind(this);
                                         try {
                                             f && 0 < o.indexOf("tag.atom") && s("tag.atom.gamedistribution.com", "atom-tag-prod-aws.gamedistribution.com"),
-                                            a && 0 < o.indexOf("msgrt.gamedistribution.com") && (null != (u = hE) && u.aws_tst,
+                                            a && 0 < o.indexOf("removed.invalid") && (null != (u = hE) && u.aws_tst,
                                             null != (c = hE) && null != (l = c.aws_tst) && null != (d = l.ep) && d.msgrt,
-                                            s("msgrt.gamedistribution.com", "msgrt-prod-aws.gamedistribution.com"))
+                                            s("removed.invalid", "msgrt-prod-aws.gamedistribution.com"))
                                         } catch (e) {}
                                         return e.next = 9,
                                         m(o, i);
@@ -17308,7 +17308,7 @@
                                         0 < (null == t || null == (n = t.adsense_host) ? void 0 : n.length) && (o["data-ad-host"] = t.adsense_host),
                                         !0 === (null == t ? void 0 : t.adsense_adbreak_test) && (o["data-adbreak-test"] = "on"),
                                         e.next = 14,
-                                        bn("patch/js/null.js?https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", "afg", {
+                                        bn("patch/js/null.js?https://removed.invalid/pagead/js/adsbygoogle.js", "afg", {
                                             error_prefix: "Blocked:",
                                             exists: function() {
                                                 return D(this, i),
@@ -18166,7 +18166,7 @@
                                         return o = encodeURIComponent(this.productName),
                                         i = encodeURIComponent(n),
                                         e.prev = 8,
-                                        a = "https://tracker-v4.gamedock.io/v1/events-tracker/track/product/".concat(o, "/user_id/").concat(i),
+                                        a = "https://removed.invalid/v1/events-tracker/track/product/".concat(o, "/user_id/").concat(i),
                                         e.next = 12,
                                         fetch(a, {
                                             method: "POST"
@@ -18180,7 +18180,7 @@
                                         e.t0 = e.catch(8),
                                         console.log("GAME_DOCK. fail v4", e.t0),
                                         e.prev = 18,
-                                        a = "https://tracker.gamedock.io/v1/events-tracker/track/product/".concat(o, "/user_id/").concat(i),
+                                        a = "https://removed.invalid/v1/events-tracker/track/product/".concat(o, "/user_id/").concat(i),
                                         e.next = 22,
                                         fetch(a, {
                                             method: "POST"
@@ -19348,7 +19348,7 @@
                         value: function() {
                             var t = this;
                             try {
-                                var e = ["patch/js/null.js?https://cdn.gamedock.io/gamemonkey-web-tracker/5.0.0/script/gamemonkey-sdk.js"];
+                                var e = ["patch/js/null.js?https://removed.invalid/gamemonkey-web-tracker/5.0.0/script/gamemonkey-sdk.js"];
                                 bn(e[0], "GamedockSDK", {
                                     alternates: e
                                 }).then(function() {
