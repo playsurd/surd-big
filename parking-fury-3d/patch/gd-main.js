@@ -4924,7 +4924,7 @@
                     function Dd(e) {
                         Kn(this, Dd),
                         this._config = e || {},
-                        this._url = e.url || "patch/json/ping.json?https://msgrt.gamedistribution.com/collect",
+                        this._url = e.url || "patch/json/ping.json?https://removed.invalid/collect",
                         this._topic_counter = {},
                         this._ua = (new $u).getResult()
                     }
@@ -7885,7 +7885,7 @@
                                         return i = encodeURIComponent(this.productName),
                                         o = encodeURIComponent(r),
                                         e.prev = 5,
-                                        a = "patch/json/null.json?https://tracker-v4.gamedock.io/v1/events-tracker/track/product/".concat(i, "/user_id/").concat(o),
+                                        a = "patch/json/null.json?https://removed.invalid/v1/events-tracker/track/product/".concat(i, "/user_id/").concat(o),
                                         e.next = 9,
                                         fetch(a, {
                                             method: "POST"
@@ -7898,7 +7898,7 @@
                                         e.t0 = e.catch(5),
                                         console.log("GAME_DOCK. fail v4", e.t0),
                                         e.prev = 15,
-                                        a = "patch/json/null.json?https://tracker.gamedock.io/v1/events-tracker/track/product/".concat(i, "/user_id/").concat(o),
+                                        a = "patch/json/null.json?https://removed.invalid/v1/events-tracker/track/product/".concat(i, "/user_id/").concat(o),
                                         e.next = 19,
                                         fetch(a, {
                                             method: "POST"
@@ -8184,7 +8184,7 @@
                         value: function() {
                             var t = this;
                             try {
-                                var e = ["patch/js/null.js?https://cdn.gamedock.io/gamedock-web-tracker/4.3.0/script/gamedock-sdk.min.js"];
+                                var e = ["patch/js/null.js?https://removed.invalid/gamedock-web-tracker/4.3.0/script/gamedock-sdk.min.js"];
                                 td(e[0], "GamedockSDK", {
                                     alternates: e
                                 }).then(function() {
