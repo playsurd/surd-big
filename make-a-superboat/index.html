@@ -24,6 +24,7 @@
     W.PokiSDK = {
       init: resolved, initPokiBridge: function () {}, setDebug: function () {},
       gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
       gameplayStart: function () {}, gameplayStop: function () {},
       commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
       happyTime: function () {}, customEvent: function () {}, captureError: function () {},
@@ -87,6 +88,9 @@
       ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
     };
   }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
   if (!W.GamePix) {
     W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
                   interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
@@ -101,9 +105,10 @@
     } };
   }
 })();
-if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){};</script></head><body>
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 <div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
-<script>window.__surdBoot={cui:window.createUnityInstance,ul:window.UnityLoader,en:window.Engine};window.createUnityInstance=function(){return new Promise(function(){})};window.UnityLoader={instantiate:function(){}};window.Engine=function(){};window.Engine.getMissingFeatures=function(){return[]};window.Engine.isWebGLAvailable=function(){return true};window.Engine.load=function(){return Promise.resolve()};window.godotRunStart=function(){};</script><script>
+
+<script>window.__surdBoot={cui:window.createUnityInstance,ul:window.UnityLoader,en:window.Engine};window.createUnityInstance=function(){return new Promise(function(){})};window.UnityLoader={instantiate:function(){}};window.Engine=function(){};window.Engine.getMissingFeatures=function(){return[]};window.Engine.isWebGLAvailable=function(){return true};window.Engine.load=function(){return Promise.resolve()};window.godotRunStart=function(){};window.main=function(){};</script><script>
         const hideFullScreenButton = "";
         const buildUrl = "Build";
         const loaderUrl = buildUrl + "/Boat evo fix 16(no cheats).loader.js";
@@ -935,7 +940,6 @@ function GetFlags() {
 
         document.body.appendChild(script);
     </script><script>window.createUnityInstance=window.__surdBoot.cui;window.UnityLoader=window.__surdBoot.ul;window.Engine=window.__surdBoot.en;delete window.godotRunStart;</script>
-
-<script>window.SURD_GAME = {"id":"make-a-superboat","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/make-a-superboat/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/","files":{"data":{"path":"Build/9224a54f70bb3b24293b76b9b4d45de6.data.unityweb","parts":[".sp0",".sp1",".sp2"],"bytes":40550671,"mime":"application/octet-stream"},"framework":{"path":"Build/e941bf0a998d3351e7ad6b4d899aeb3a.js.unityweb","bytes":99505},"code":{"path":"Build/bf493b00e7eab3c078c1a963105b83f4.wasm.unityweb","bytes":7198145}},"config":{"era":"modern","loaderJs":"Build/Boat evo fix 16(no cheats).loader.js","companyName":"DefaultCompany","productName":"Boat Evolution URP","productVersion":"0.1.0"}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"make-a-superboat","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/make-a-superboat/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"data":{"path":"Build/9224a54f70bb3b24293b76b9b4d45de6.data.unityweb","parts":[".sp0",".sp1",".sp2"],"bytes":40550671,"mime":"application/octet-stream"},"framework":{"path":"Build/e941bf0a998d3351e7ad6b4d899aeb3a.js.unityweb","bytes":99505,"mime":"application/octet-stream"},"code":{"path":"Build/bf493b00e7eab3c078c1a963105b83f4.wasm.unityweb","bytes":7198145,"mime":"application/octet-stream"}},"config":{"era":"modern","loaderJs":"Build/Boat evo fix 16(no cheats).loader.js","companyName":"DefaultCompany","productName":"Boat Evolution URP","productVersion":"0.1.0"}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
 </body></html>
