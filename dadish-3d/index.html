@@ -105,6 +105,16 @@
     } };
   }
 })();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
 if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 <div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
 <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/dadish-3d/loaders/v3/master-loader.js"></script>
@@ -132,6 +142,6 @@ if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this
 		"metadata": {"poki_template_version":1,"background_color":"#FFFFFF","background_filename":"aeee076b08e9151a7a7bc956a6796b1d.jpg","code_filename":"95c35c14f99c257b8362061616967b38.wasm","company_name":"Thomas K. Young","data_filename":"1e1205ddd913941ee03ba9e2184e5318.data","development_player":"false","framework_filename":"94456554906d4faa25c8323b67abe9b2.framework.js","height":"540","loader_filename":"73bfcd05b4c6eae6045dbd2c65d047ba.loader.js","product_name":"Dadish 3D","product_version":"1.00","splash_screen_style":"Dark","unity_version":"2023.2.20f1","use_data_caching":"true","use_threads":"false","use_wasm":"true","use_webgl_2_0":"true","width":"960"}
 	};
 	</script>
-<script>window.SURD_GAME = {"id":"dadish-3d","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/dadish-3d/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"data":{"path":"Build/1e1205ddd913941ee03ba9e2184e5318.data","parts":[".sp0",".sp1"],"bytes":31834445,"mime":"application/octet-stream"},"framework":{"path":"Build/94456554906d4faa25c8323b67abe9b2.framework.js","bytes":368524,"mime":"text/javascript"},"code":{"path":"Build/95c35c14f99c257b8362061616967b38.wasm","parts":[".sp0",".sp1",".sp2"],"bytes":39407669,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/73bfcd05b4c6eae6045dbd2c65d047ba.loader.js","companyName":"surd","productName":"dadish-3d","productVersion":"1.0"}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"dadish-3d","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/dadish-3d/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v82b730af12/","files":{"data":{"path":"Build/1e1205ddd913941ee03ba9e2184e5318.data","parts":[".sp0",".sp1"],"bytes":31834445,"mime":"application/octet-stream"},"framework":{"path":"Build/94456554906d4faa25c8323b67abe9b2.framework.js","bytes":368524,"mime":"text/javascript"},"code":{"path":"Build/95c35c14f99c257b8362061616967b38.wasm","parts":[".sp0",".sp1",".sp2"],"bytes":39407669,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/73bfcd05b4c6eae6045dbd2c65d047ba.loader.js","companyName":"surd","productName":"dadish-3d","productVersion":"1.0"}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v82b730af12/runtime.js"></script>
 </body></html>
