@@ -24,6 +24,7 @@
     W.PokiSDK = {
       init: resolved, initPokiBridge: function () {}, setDebug: function () {},
       gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
       gameplayStart: function () {}, gameplayStop: function () {},
       commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
       happyTime: function () {}, customEvent: function () {}, captureError: function () {},
@@ -87,6 +88,9 @@
       ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
     };
   }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
   if (!W.GamePix) {
     W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
                   interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
@@ -101,8 +105,16 @@
     } };
   }
 })();
-if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){};</script></head><body>
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 <div id="unity-container" class="unity-desktop" style="position:absolute;inset:0"><canvas id="unity-canvas" style="width:100vw;height:100vh;display:block"></canvas><div id="loading-cover" style="display:none"></div><div id="unity-loading-bar" style="display:none"><div id="unity-logo"></div><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div><div id="unity-footer"><div id="unity-webgl-logo"></div><div id="unity-fullscreen-button"></div><div id="unity-build-title"></div></div></div>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/patch/master-loader.js"></script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-app-compat.js"></script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-auth-compat.js"></script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-database-compat.js"></script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-performance-compat.js"></script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-functions-compat.js"></script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/scripts/main.js"></script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/scripts/auth.js"></script>
 <script>
 	window.config = {
 		loader: 'unity-2020',
@@ -158,14 +170,6 @@ if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){};</
 		}
 
 	</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/patch/master-loader.js"></script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-app-compat.js"></script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-auth-compat.js"></script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-database-compat.js"></script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-performance-compat.js"></script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/firebase-functions-compat.js"></script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/scripts/main.js"></script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/scripts/auth.js"></script>
-<script>window.SURD_GAME = {"id":"smash-karts","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/","files":{"data":{"path":"Build/b4c6ea99dc51c73858f47239f387f162.data","parts":[".sp0",".sp1"],"bytes":30346175,"mime":"application/octet-stream"},"framework":{"path":"Build/6a793744ad86b15bfe005393e138d5ef.js","bytes":664867},"code":{"path":"Build/f944e4c35e7de77e9a40598d481f8cba.wasm","parts":[".sp0",".sp1"],"bytes":35618848,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/SmashKarts_sp6.loader.js","companyName":"surd","productName":"smash-karts","productVersion":"1.0"}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vac4f82b81e/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"smash-karts","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/smash-karts/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"data":{"path":"Build/b4c6ea99dc51c73858f47239f387f162.data","parts":[".sp0",".sp1"],"bytes":30346175,"mime":"application/octet-stream"},"framework":{"path":"Build/6a793744ad86b15bfe005393e138d5ef.js","bytes":664867,"mime":"text/javascript"},"code":{"path":"Build/f944e4c35e7de77e9a40598d481f8cba.wasm","parts":[".sp0",".sp1"],"bytes":35618848,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/SmashKarts_sp6.loader.js","companyName":"surd","productName":"smash-karts","productVersion":"1.0"}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
 </body></html>
