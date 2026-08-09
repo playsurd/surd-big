@@ -7371,7 +7371,7 @@ ig.module("plugins.splash-loader").requires("impact.loader", "impact.animation")
         },
         end: function() {
             this.parent();
-            var b = 0 <= "https://cdn.jsdelivr.net/gh/playsurd/surd-assets@main/defend-the-tank/".indexOf("localhost") ? 500 : 3E3;
+            var b = 0 <= "https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/defend-the-tank/".indexOf("localhost") ? 500 : 3E3;
             window.setTimeout("ig.system.setGame(MyGame)", b)
         },
         setupCustomAnimation: function() {
