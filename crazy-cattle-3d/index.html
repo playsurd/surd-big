@@ -105,6 +105,16 @@
     } };
   }
 })();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
 if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};</script></head><body>
 
 
@@ -231,6 +241,6 @@ const engine = new Engine(GODOT_CONFIG);
     e.returnValue = '';
   });
 </script>
-<script>window.SURD_GAME = {"id":"crazy-cattle-3d","engine":"godot","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/crazy-cattle-3d/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/","files":{"pck":{"path":"CrazyCattle3D.pck","parts":[".sp0",".sp1"],"bytes":28642672,"mime":"application/octet-stream"},"wasm":{"path":"CrazyCattle3D.wasm","parts":[".sp0",".sp1",".sp2"],"bytes":43444261,"mime":"application/wasm"}},"config":{"indexJs":"CrazyCattle3D.js","godotConfig":{"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"CrazyCattle3D","experimentalVK":false,"fileSizes":{"CrazyCattle3D.pck":28642672,"CrazyCattle3D.wasm":43444261},"focusCanvas":true,"gdextensionLibs":[],"serviceWorker":"CrazyCattle3D.service.worker.js"}}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/v4b8615f6da/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"crazy-cattle-3d","engine":"godot","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/crazy-cattle-3d/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vd90635141c/","files":{"pck":{"path":"CrazyCattle3D.pck","parts":[".sp0",".sp1"],"bytes":28642672,"mime":"application/octet-stream"},"wasm":{"path":"CrazyCattle3D.wasm","parts":[".sp0",".sp1",".sp2"],"bytes":43444261,"mime":"application/wasm"}},"config":{"indexJs":"CrazyCattle3D.js","godotConfig":{"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"CrazyCattle3D","experimentalVK":false,"fileSizes":{"CrazyCattle3D.pck":28642672,"CrazyCattle3D.wasm":43444261},"focusCanvas":true,"gdextensionLibs":[],"serviceWorker":"CrazyCattle3D.service.worker.js"}}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vd90635141c/runtime.js"></script>
 </body></html>
