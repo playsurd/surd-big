@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+<base href="https://cdn.jsdelivr.net/gh/playsurd/surd-assets@main/color-switch/">
+<script>(function () {
+  var W = window;
+  var unityTarget = null;
+  function tellUnity(methods, arg) {
+    var inst = W.__surdUnity || W.unityInstance || W.gameInstance;
+    if (!inst || !inst.SendMessage || !unityTarget) return;
+    for (var i = 0; i < methods.length; i++) {
+      try { arg === undefined ? inst.SendMessage(unityTarget, methods[i]) : inst.SendMessage(unityTarget, methods[i], arg); }
+      catch (e) {  }
+    }
+  }
+  if (typeof W.initPokiBridge !== 'function') {
+    W.initPokiBridge = function (name) { unityTarget = name || unityTarget; };
+  }
+  if (typeof W.commercialBreak !== 'function') {
+    W.commercialBreak = function () { setTimeout(function () { tellUnity(['CommercialBreakComplete', 'commercialBreakComplete']); }, 0); };
+  }
+  if (typeof W.rewardedBreak !== 'function') {
+    W.rewardedBreak = function () { setTimeout(function () { tellUnity(['RewardedBreakComplete', 'rewardedBreakComplete'], 'false'); }, 0); };
+  }
+  var resolved = function () { return Promise.resolve(); };
+  if (!W.PokiSDK) {
+    W.PokiSDK = {
+      init: resolved, initPokiBridge: function () {}, setDebug: function () {},
+      gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
+      gameplayStart: function () {}, gameplayStop: function () {},
+      commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
+      happyTime: function () {}, customEvent: function () {}, captureError: function () {},
+      isAdBlocked: function () { return false; }, shareableURL: function () { return Promise.resolve(location.href); },
+      getURLParam: function (k) { try { return new URL(location.href).searchParams.get(k) || ''; } catch (e) { return ''; } },
+    };
+  }
+  if (!W.YaGames) {
+    var yPlayer = {
+      getName: function () { return 'player'; }, getUniqueID: function () { return 'local'; },
+      getData: function () { return Promise.resolve({}); }, setData: resolved,
+      getStats: function () { return Promise.resolve({}); }, setStats: resolved, incrementStats: resolved,
+      getMode: function () { return 'lite'; }, getPhoto: function () { return ''; },
+    };
+    var yLeaderboards = {
+      setLeaderboardScore: resolved,
+      getLeaderboardEntries: function () { return Promise.resolve({ entries: [] }); },
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardDescription: function () { return Promise.resolve({}); },
+    };
+    var ySdk = {
+      adv: {
+        showFullscreenAdv: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(false); }, 0); },
+        showRewardedVideo: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(); }, 0); },
+        getBannerAdvStatus: function () { return Promise.resolve({ stickyAdvIsShowing: false }); },
+      },
+      getPlayer: function () { return Promise.resolve(yPlayer); },
+      getPayments: function () { return Promise.resolve({
+        getCatalog: function () { return Promise.resolve([]); },
+        getPurchases: function () { return Promise.resolve([]); },
+        purchase: function () { return Promise.reject(new Error('payments unavailable')); },
+        consumePurchase: resolved,
+      }); },
+      getFlags: function () { return Promise.resolve({}); },
+      getStorage: function () { return Promise.resolve(window.localStorage); },
+      clipboard: { writeText: resolved },
+      shortcut: { canShowPrompt: function () { return Promise.resolve({ canShow: false }); }, showPrompt: function () { return Promise.resolve({ outcome: 'rejected' }); } },
+      feedback: { canReview: function () { return Promise.resolve({ value: false }); }, requestReview: function () { return Promise.resolve({ feedbackSent: false }); } },
+      getLeaderboards: function () { return Promise.resolve(yLeaderboards); },
+      features: { LoadingAPI: { ready: function () {} } },
+      screen: { fullscreen: { request: resolved, exit: resolved } },
+      isAvailableMethod: function () { return Promise.resolve(false); },
+      environment: { i18n: { lang: 'en' }, app: { id: 'local' } },
+      deviceInfo: { isDesktop: function () { return true; }, isMobile: function () { return false; },
+                    isTablet: function () { return false; }, isTV: function () { return false; },
+                    type: 'desktop' },
+    };
+    W.YaGames = { init: function () { return Promise.resolve(ySdk); } };
+    W.ysdk = ySdk;
+  }
+  if (!W.ytgame) {
+    var ytNoop = function () {};
+    W.ytgame = {
+      IN_PLAYABLES_ENV: false,
+      game: { firstFrameReady: ytNoop, gameReady: ytNoop, loadData: function () { return Promise.resolve(''); },
+              saveData: function () { return Promise.resolve(); }, isPaused: function () { return false; } },
+      system: { getLanguage: function () { return 'en'; }, isAudioEnabled: function () { return true; },
+                onAudioEnabledChange: ytNoop, onPause: ytNoop, onResume: ytNoop },
+      health: { logError: ytNoop, logWarning: ytNoop },
+      engagement: { sendScore: function () { return Promise.resolve(); } },
+      ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
+    };
+  }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
+  if (!W.GamePix) {
+    W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+                  interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
+  }
+  if (!W.CrazyGames) {
+    var noop = function () {};
+    W.CrazyGames = { SDK: {
+      init: resolved, game: { gameplayStart: noop, gameplayStop: noop, loadingStart: noop, loadingStop: noop, happytime: noop },
+      ad: { requestAd: function (t, cb) { if (cb && cb.adFinished) cb.adFinished(); }, hasAdblock: function () { return Promise.resolve(false); } },
+      user: { getUser: function () { return Promise.resolve(null); } },
+      banner: { requestBanner: resolved, clearAllBanners: noop },
+    } };
+  }
+})();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};
+window.alert=function(){};window.confirm=function(){return false;};window.prompt=function(){return null;};</script>
+<script>window.SURD_GAME={"id":"color-switch","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-assets@main/color-switch/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{},"config":{}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+
+    <script crossorigin="anonymous" src="/js/all.min.js" async></script>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Color Switch</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <style>
+    /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background-color: black;
+    }
+
+    canvas.emscripten {
+      border: 0px none;
+      height: 100%;
+    }
+
+    canvas.emscripten.visible {
+      opacity: 1;
+      transition: opacity 0.5s ease-in;
+      transition-delay: 1s;
+    }
+
+    .canvas-container {
+      position: relative;
+      max-height: 0%;
+      background-color: black;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      margin: 0px auto;
+      text-align: center;
+
+    }
+
+    .canvas-container:after {
+      padding-top: 133.3333%;
+      /* 16:9 ratio */
+      display: block;
+      content: '';
+    }
+
+    .progress {
+      position: absolute;
+      top: 84%;
+      left: 0;
+      right: 0;
+      width: 90%;
+      height: 28px;
+      margin: 0 auto;
+      margin-bottom: 24px;
+      overflow: hidden;
+      border-radius: 2px;
+      background-color: #F7F7F7;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .progress-bar {
+      float: left;
+      width: 0;
+      min-width: 2%;
+      height: 100%;
+      font-size: 20px;
+      font-family: monospace;
+      line-height: 28px;
+      color: #AAA;
+      text-align: center;
+      transition: width .1s ease;
+      background-color: #292929;
+    }
+
+    .touchLayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+<script>
+(function(){try{var m=(window.location.search||'').match(/[?&]__lp=([^&]+)/);var n=m?decodeURIComponent(m[1]):'';if(window.parent&&window.parent!==window){window.parent.postMessage({__lumin:'frame-ok',game:'selenite/colorswitch',nonce:n},'*');}}catch(e){}})();
+</script>
+<!-- Google tag (gtag.js) -->
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L69H1VNZ27');
+</script>
+<script>
+  window.__lumin_game_id = 'selenite/colorswitch';
+  console.log('[LuminSDK] Game loaded:', 'selenite/colorswitch');
+</script>
+
+</head>
+
+<body>
+  <div class="canvas-container">
+    <!-- onclick="void(0)" -->
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <div id="progress" class="progress">
+      <div id="progress-bar" class="progress-bar" style="width: 0%">0%</div>
+    </div>
+
+    <a id="link_android" target="__blank"
+      href="https://play.google.com/store/apps/details?id=com.fortafygames.colorswitch"
+      style="position: absolute; display: none;"></a>
+    <a id="link_ios" target="__blank" href="https://itunes.apple.com/app/id1053533457"
+      style="position: absolute; display: none;"></a>
+    <a id="link_fb" target="__blank" href="https://www.facebook.com/fortafygames"
+      style="position: absolute; display: none;"></a>
+    <a id="link_poki" target="__blank" href="http://poki.com/" style="position: absolute; display: none;"></a>
+
+    <!--<div id="touch" class="touchLayer">
+        </div>-->
+    <div id="poki-sdk-container" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+    </div>
+  </div>
+  <script type='text/javascript'>
+
+    // connect to canvas
+    var Module = {
+      preRun: [],
+      postRun: [],
+      print: function () {
+        console.log(Array.prototype.slice.call(arguments).join(" "));
+      },
+      printErr: function () {
+        console.warn(Array.prototype.slice.call(arguments).join(" "));
+      },
+      canvas: document.getElementById('canvas'),
+      totalDependencies: 0,
+      monitorRunDependencies: function (left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        //console.log('Downloading...', (100*(this.totalDependencies-left)/this.totalDependencies) + '%');
+        //console.log(Module);
+        // console.log('monitorRunDependencies', left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+      }
+    }
+
+
+    window.addEventListener("keydown", function (e) {
+      // space and arrow keys
+      if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+      }
+    }, false);
+
+    function addEvent(elementId, evnt, funct) {
+      var element = document.getElementById(elementId);
+      if (element.attachEvent)
+        return element.attachEvent('on' + evnt, funct);
+      else
+        return element.addEventListener(evnt, funct, false);
+    }
+
+
+    function setupCanvasTouchEvents() {
+      var canvas = document.getElementById("canvas");
+      var el = document.getElementById("canvas"); // "touch"
+      function adjustX(x) {
+        return x * canvas.width / parseInt(getComputedStyle(el).width, 10);
+      }
+      function adjustY(y) {
+        return y * canvas.height / parseInt(getComputedStyle(el).height, 10);
+      }
+
+      el.addEventListener("touchstart", function (evt) {
+        evt.preventDefault();
+        var touches = evt.changedTouches;
+        for (var i = 0; i < touches.length; i++) {
+          var touch = touches[i];
+          //console.log('_pInput_TouchStart', _pInput_TouchStart);
+          _pInput_TouchStart(touch.identifier % 10, adjustX(touch.clientX), adjustY(touch.clientY));
+        }
+      }, false);
+      el.addEventListener("touchend", function (evt) {
+        evt.preventDefault();
+        var touches = evt.changedTouches;
+        for (var i = 0; i < touches.length; i++) {
+          var touch = touches[i];
+          _pInput_TouchEnd(touch.identifier % 10);
+        }
+      }, false);
+      el.addEventListener("touchmove", function (evt) {
+        evt.preventDefault();
+        var touches = evt.changedTouches;
+        for (var i = 0; i < touches.length; i++) {
+          var touch = touches[i];
+          _pInput_TouchMove(touch.identifier % 10, adjustX(touch.clientX), adjustY(touch.clientY));
+        }
+      }, false);
+    }
+
+    var progressBar = document.getElementById("progress-bar");
+    var interval = setInterval(function () {
+      if (Module.dataFileDownloads && Module.dataFileDownloads["game.data"]) {
+        var data = Module.dataFileDownloads["game.data"];
+        //console.log(data.loaded, '/', data.total)
+        var percent = Math.round(data.loaded * 100 / data.total);
+        progressBar.style.width = percent + '%';
+        progressBar.innerHTML = percent + '%';
+        if (data.loaded >= data.total) {
+          document.getElementById("progress").style.display = "none";
+          document.getElementById("canvas").className += " visible";
+          setupCanvasTouchEvents();
+          clearInterval(interval);
+        }
+      }
+    }, 100);
+
+  </script>
+  <script crossorigin="anonymous" async type="text/javascript" src="game.js"></script>
+
+</body>
+
+</html>
