@@ -1,0 +1,516 @@
+<!doctype html>
+<head>
+<base href="https://cdn.jsdelivr.net/gh/playsurd/surd-assets@main/sudoku/">
+<script>(function () {
+  var W = window;
+  var unityTarget = null;
+  function tellUnity(methods, arg) {
+    var inst = W.__surdUnity || W.unityInstance || W.gameInstance;
+    if (!inst || !inst.SendMessage || !unityTarget) return;
+    for (var i = 0; i < methods.length; i++) {
+      try { arg === undefined ? inst.SendMessage(unityTarget, methods[i]) : inst.SendMessage(unityTarget, methods[i], arg); }
+      catch (e) {  }
+    }
+  }
+  if (typeof W.initPokiBridge !== 'function') {
+    W.initPokiBridge = function (name) { unityTarget = name || unityTarget; };
+  }
+  if (typeof W.commercialBreak !== 'function') {
+    W.commercialBreak = function () { setTimeout(function () { tellUnity(['CommercialBreakComplete', 'commercialBreakComplete']); }, 0); };
+  }
+  if (typeof W.rewardedBreak !== 'function') {
+    W.rewardedBreak = function () { setTimeout(function () { tellUnity(['RewardedBreakComplete', 'rewardedBreakComplete'], 'false'); }, 0); };
+  }
+  var resolved = function () { return Promise.resolve(); };
+  if (!W.PokiSDK) {
+    W.PokiSDK = {
+      init: resolved, initPokiBridge: function () {}, setDebug: function () {},
+      gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
+      gameplayStart: function () {}, gameplayStop: function () {},
+      commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
+      happyTime: function () {}, customEvent: function () {}, captureError: function () {},
+      isAdBlocked: function () { return false; }, shareableURL: function () { return Promise.resolve(location.href); },
+      getURLParam: function (k) { try { return new URL(location.href).searchParams.get(k) || ''; } catch (e) { return ''; } },
+    };
+  }
+  if (!W.YaGames) {
+    var yPlayer = {
+      getName: function () { return 'player'; }, getUniqueID: function () { return 'local'; },
+      getData: function () { return Promise.resolve({}); }, setData: resolved,
+      getStats: function () { return Promise.resolve({}); }, setStats: resolved, incrementStats: resolved,
+      getMode: function () { return 'lite'; }, getPhoto: function () { return ''; },
+    };
+    var yLeaderboards = {
+      setLeaderboardScore: resolved,
+      getLeaderboardEntries: function () { return Promise.resolve({ entries: [] }); },
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardDescription: function () { return Promise.resolve({}); },
+    };
+    var ySdk = {
+      adv: {
+        showFullscreenAdv: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(false); }, 0); },
+        showRewardedVideo: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(); }, 0); },
+        getBannerAdvStatus: function () { return Promise.resolve({ stickyAdvIsShowing: false }); },
+      },
+      getPlayer: function () { return Promise.resolve(yPlayer); },
+      getPayments: function () { return Promise.resolve({
+        getCatalog: function () { return Promise.resolve([]); },
+        getPurchases: function () { return Promise.resolve([]); },
+        purchase: function () { return Promise.reject(new Error('payments unavailable')); },
+        consumePurchase: resolved,
+      }); },
+      getFlags: function () { return Promise.resolve({}); },
+      getStorage: function () { return Promise.resolve(window.localStorage); },
+      clipboard: { writeText: resolved },
+      shortcut: { canShowPrompt: function () { return Promise.resolve({ canShow: false }); }, showPrompt: function () { return Promise.resolve({ outcome: 'rejected' }); } },
+      feedback: { canReview: function () { return Promise.resolve({ value: false }); }, requestReview: function () { return Promise.resolve({ feedbackSent: false }); } },
+      getLeaderboards: function () { return Promise.resolve(yLeaderboards); },
+      features: { LoadingAPI: { ready: function () {} } },
+      screen: { fullscreen: { request: resolved, exit: resolved } },
+      isAvailableMethod: function () { return Promise.resolve(false); },
+      environment: { i18n: { lang: 'en' }, app: { id: 'local' } },
+      deviceInfo: { isDesktop: function () { return true; }, isMobile: function () { return false; },
+                    isTablet: function () { return false; }, isTV: function () { return false; },
+                    type: 'desktop' },
+    };
+    W.YaGames = { init: function () { return Promise.resolve(ySdk); } };
+    W.ysdk = ySdk;
+  }
+  if (!W.ytgame) {
+    var ytNoop = function () {};
+    W.ytgame = {
+      IN_PLAYABLES_ENV: false,
+      game: { firstFrameReady: ytNoop, gameReady: ytNoop, loadData: function () { return Promise.resolve(''); },
+              saveData: function () { return Promise.resolve(); }, isPaused: function () { return false; } },
+      system: { getLanguage: function () { return 'en'; }, isAudioEnabled: function () { return true; },
+                onAudioEnabledChange: ytNoop, onPause: ytNoop, onResume: ytNoop },
+      health: { logError: ytNoop, logWarning: ytNoop },
+      engagement: { sendScore: function () { return Promise.resolve(); } },
+      ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
+    };
+  }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
+  if (!W.GamePix) {
+    W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+                  interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
+  }
+  if (!W.CrazyGames) {
+    var noop = function () {};
+    W.CrazyGames = { SDK: {
+      init: resolved, game: { gameplayStart: noop, gameplayStop: noop, loadingStart: noop, loadingStop: noop, happytime: noop },
+      ad: { requestAd: function (t, cb) { if (cb && cb.adFinished) cb.adFinished(); }, hasAdblock: function () { return Promise.resolve(false); } },
+      user: { getUser: function () { return Promise.resolve(null); } },
+      banner: { requestBanner: resolved, clearAllBanners: noop },
+    } };
+  }
+})();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};
+window.alert=function(){};window.confirm=function(){return false;};window.prompt=function(){return null;};</script>
+<script>window.SURD_GAME={"id":"sudoku","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-assets@main/sudoku/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{},"config":{}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+
+	<title>Sudoku</title>
+  
+	<meta name="viewport" content="width=360, initial-scale=0.6, maximum-scale=0.6, user-scalable=yes">
+	<script crossorigin="anonymous" src="/js/all.min.js" async></script>
+      
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" integrity="sha512-S6hLYzz2hVBjcFOZkAOO+qEkytvbg2k9yZ1oO+zwXNYnQU71syCWhWtIk3UYDvUW2FCIwkzsTcwkEE58EZPnIQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+<style>
+                              @import url('https://fonts.cdnfonts.com/css/segoe-ui-4');
+  body {
+	background:#fff;
+	margin:0;
+	padding:0;
+	font-family:Segoe UI, Open Sans, Ubuntu, Arial, sans-serif;
+}
+main {
+	width:352px;
+	margin:20px auto;	
+}
+h1, p, h4 {
+	text-align:center;
+	margin:0;
+	padding:0;
+}
+h4 {
+	margin-bottom:10px;
+}
+p {
+	height:20px;
+	line-height:20px;
+	font-size:18px;
+}
+table {
+	background:#fff;
+	margin:10px auto 20px auto;
+	padding:0;
+	
+}
+table td {
+	width:36px;
+	height:36px;
+	border-collapse:collapse;
+	padding:0;
+	margin:0;
+}
+table td input {
+	border:none;
+	width:34px;
+	height:34px;
+	font-size:18px;
+	text-align:center;
+	border:1px solid #333;
+	border-radius:3px;
+	color:#000;
+	transition-property: background, color;
+	transition-duration: 1s;
+	
+}
+table td input.alt {
+	background:#ddd;
+	color:#000;
+}
+table td input.prepopulated{
+	color:#000 !important;
+	font-weight:bold;
+	opacity:1 !important;
+	-webkit-text-fill-color:#000;
+}
+table td input.playable {
+	color:#c30;
+}
+table td input.inerror,
+table td input.prepopulated.inerror {
+	background:red !important;
+	color:#fff;
+	-webkit-text-fill-color:#fff;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+input[type=number] {
+    -moz-appearance:textfield;
+}
+p .error {
+	display:none;
+	color:red;
+}
+p .ok {
+	display:none;
+}
+p .notfilled, p .completed {
+	font-weight:bold;
+	display:none;
+}
+p .notfilled {
+	font-size:0.8em;
+	color:red;
+}
+p .completed {
+	color:#c30;
+}
+button {
+	margin:5px auto;
+	display:block;
+	font-size:1.1em;
+	background:#fff;
+	padding:5px;
+	border:1px solid #999;
+	border-radius:3px;
+	color:#666;
+	
+}
+      </style>
+        
+  <script>
+(function(){try{var m=(window.location.search||'').match(/[?&]__lp=([^&]+)/);var n=m?decodeURIComponent(m[1]):'';if(window.parent&&window.parent!==window){window.parent.postMessage({__lumin:'frame-ok',game:'selenite/sudo',nonce:n},'*');}}catch(e){}})();
+</script>
+<!-- Google tag (gtag.js) -->
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L69H1VNZ27');
+</script>
+<script>
+  window.__lumin_game_id = 'selenite/sudo';
+  console.log('[LuminSDK] Game loaded:', 'selenite/sudo');
+</script>
+
+</head>
+<body>
+	<div class="main">
+      <br>
+      <h1>SUDOKU</h1>
+		<p>
+			<span class="error">There are duplicates</span>
+			<span class="ok">No duplicates found!</span>
+		</p>
+		<p>
+			<span class="notfilled">There are still empty cells!</span>
+			<span class="completed">You're done!</span>
+		</p>
+		<table cellpadding="0" cellspacing="1" border="0" align="center">
+			<tr>
+				<td><input type="number" value="" maxlength="1" class="sector1 row1 column1 keyrow keycolumn keysector alt"></td>
+				<td><input type="number" value="3" maxlength="1" class="sector1 row1 column2 keycolumn  alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector1 row1 column3 keycolumn alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector2 row1 column4 keycolumn keysector"></td>
+				<td><input type="number" value="" maxlength="1" class="sector2 row1 column5 keycolumn"></td>
+				<td><input type="number" value="6" maxlength="1" class="sector2 row1 column6 keycolumn"></td>
+				<td><input type="number" value="" maxlength="1" class="sector3 row1 column7 keycolumn keysector alt"></td>
+				<td><input type="number" value="7" maxlength="1" class="sector3 row1 column8 keycolumn alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector3 row1 column9 keycolumn alt"></td>
+			</tr>
+			<tr>
+				<td><input type="number" value="5" maxlength="1" class="sector1 row2 column1 keyrow alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector1 row2 column2 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector1 row2 column3 alt"></td>
+				<td><input type="number" value="3" maxlength="1" class="sector2 row2 column4"></td>
+				<td><input type="number" value="" maxlength="1" class="sector2 row2 column5"></td>
+				<td><input type="number" value="9" maxlength="1" class="sector2 row2 column6"></td>
+				<td><input type="number" value="1" maxlength="1" class="sector3 row2 column7 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector3 row2 column8 alt"></td>
+				<td><input type="number" value="8" maxlength="1" class="sector3 row2 column9 alt"></td>
+			</tr>
+			<tr>
+				<td><input type="number" value="" maxlength="1" class="sector1 row3 column1 keyrow alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector1 row3 column2 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector1 row3 column3 alt"></td>
+				<td><input type="number" value="4" maxlength="1" class="sector2 row3 column4"></td>
+				<td><input type="number" value="1" maxlength="1" class="sector2 row3 column5"></td>
+				<td><input type="number" value="" maxlength="1" class="sector2 row3 column6"></td>
+				<td><input type="number" value="" maxlength="1" class="sector3 row3 column7 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector3 row3 column8 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector3 row3 column9 alt"></td>
+			</tr>
+			<tr>
+				<td><input type="number" value="2" maxlength="1" class="sector4 row4 column1 keyrow keysector"></td>
+				<td><input type="number" value="4" maxlength="1" class="sector4 row4 column2"></td>
+				<td><input type="number" value="" maxlength="1" class="sector4 row4 column3"></td>
+				<td><input type="number" value="9" maxlength="1" class="sector5 row4 column4 alt keysector"></td>
+				<td><input type="number" value="" maxlength="1" class="sector5 row4 column5 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector5 row4 column6 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector6 row4 column7 keysector"></td>
+				<td><input type="number" value="" maxlength="1" class="sector6 row4 column8"></td>
+				<td><input type="number" value="7" maxlength="1" class="sector6 row4 column9"></td>
+			</tr>
+			<tr>
+				<td><input type="number" value="6" maxlength="1" class="sector4 row5 column1 keyrow"></td>
+				<td><input type="number" value="" maxlength="1" class="sector4 row5 column2"></td>
+				<td><input type="number" value="7" maxlength="1" class="sector4 row5 column3"></td>   
+				<td><input type="number" value="2" maxlength="1" class="sector5 row5 column4 alt"></td>
+				<td><input type="number" value="5" maxlength="1" class="sector5 row5 column5 alt"></td>
+				<td><input type="number" value="3" maxlength="1" class="sector5 row5 column6 alt"></td>
+				<td><input type="number" value="9" maxlength="1" class="sector6 row5 column7"></td>
+				<td><input type="number" value="" maxlength="1" class="sector6 row5 column8"></td>
+				<td><input type="number" value="4" maxlength="1" class="sector6 row5 column9"></td>
+			</tr>
+			<tr>
+				<td><input type="number" value="9" maxlength="1" class="sector4 row6 column1 keyrow"></td>
+				<td><input type="number" value="" maxlength="1" class="sector4 row6 column2"></td>
+				<td><input type="number" value="" maxlength="1" class="sector4 row6 column3"></td>
+				<td><input type="number" value="" maxlength="1" class="sector5 row6 column4 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector5 row6 column5 alt"></td>
+				<td><input type="number" value="4" maxlength="1" class="sector5 row6 column6 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector6 row6 column7"></td>
+				<td><input type="number" value="3" maxlength="1" class="sector6 row6 column8"></td>
+				<td><input type="number" value="2" maxlength="1" class="sector6 row6 column9"></td>
+			</tr>
+			<tr>
+				<td><input type="number" value="" maxlength="1" class="sector7 row7 column1 keyrow keysector alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector7 row7 column2 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector7 row7 column3 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector8 row7 column4 keysector"></td>
+				<td><input type="number" value="4" maxlength="1" class="sector8 row7 column5"></td>
+				<td><input type="number" value="2" maxlength="1" class="sector8 row7 column6"></td>
+				<td><input type="number" value="" maxlength="1" class="sector9 row7 column7 alt keysector"></td>
+				<td><input type="number" value="" maxlength="1" class="sector9 row7 column8 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector9 row7 column9 alt"></td>
+			</tr>
+			<tr>
+				<td><input type="number" value="7" maxlength="1" class="sector7 row8 column1 keyrow alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector7 row8 column2 alt"></td>
+				<td><input type="number" value="5" maxlength="1" class="sector7 row8 column3 alt"></td>
+				<td><input type="number" value="6" maxlength="1" class="sector8 row8 column4"></td>
+				<td><input type="number" value="" maxlength="1" class="sector8 row8 column5"></td>
+				<td><input type="number" value="8" maxlength="1" class="sector8 row8 column6"></td>
+				<td><input type="number" value="" maxlength="1" class="sector9 row8 column7 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector9 row8 column8 alt"></td>
+				<td><input type="number" value="3" maxlength="1" class="sector9 row8 column9 alt"></td>
+			</tr>
+			<tr>
+				<td><input type="number" value="" maxlength="1" class="sector7 row9 column1 keyrow alt"></td>
+				<td><input type="number" value="9" maxlength="1" class="sector7 row9 column2 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector7 row9 column3 alt"></td>
+				<td><input type="number" value="7" maxlength="1" class="sector8 row9 column4"></td>
+				<td><input type="number" value="" maxlength="1" class="sector8 row9 column5"></td>
+				<td><input type="number" value="" maxlength="1" class="sector8 row9 column6"></td>
+				<td><input type="number" value="" maxlength="1" class="sector9 row9 column7 alt"></td>
+				<td><input type="number" value="6" maxlength="1" class="sector9 row9 column8 alt"></td>
+				<td><input type="number" value="" maxlength="1" class="sector9 row9 column9 alt"></td>
+			</tr>
+		</table>
+		<button class="checkit">How Am I doing?</button>
+		<button class="completegame">I'm Done!</button>
+	</div>
+	<script crossorigin="anonymous" src="https://code.jquery.com/jquery-1.2.min.js"></script>
+                  	<script crossorigin="anonymous" src="http://code.jquery.com/jquery-1.2.min.js"></script>
+
+                  
+                  
+                  
+   
+                  
+                
+                  
+
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  <script>
+$(document).ready(function() {	
+	//loops through board and finds pre-populated cells and locks them
+	$('input').each(function() {
+		var prePopVal = $(this).val();
+		if (prePopVal > 0) {
+			$(this).addClass('prepopulated').attr('disabled','disabled');
+		} else {
+			$(this).addClass('playable');	
+		}
+	});	
+	//Prevents you from entering anything other than a number between 1-9
+	$('input').keyup(function(e) {
+	    $(this).val($(this).val().replace(/[^1-9\.]/g,''));
+	    var val = $(this).val();
+	    var valLength = val.length;
+	    var maxCount = $(this).attr('maxlength');
+	    if(valLength>maxCount){
+	        $(this).val($(this).val().substring(0,maxCount));
+	    }
+	    $(this).blur();
+	});
+	//"how Am I doing?" Button, fires the row, column and sector checkers
+	$('.checkit').click(function() {	
+		checkRows();
+		checkColumns();
+		checkSectors();
+	});
+	//"Complete game" Button: First checks to see if all the cells are filled, then checks for duplicates
+	$('.completegame').click(function() {
+	    var empty = $('input').filter(function() {
+	        return this.value === '';
+	    });
+	    if(empty.length) {
+		    $('.notfilled').show();
+		    setTimeout( function() {
+				$('.notfilled').fadeOut();			
+			}, 1000 );
+	    } else {
+		    $('.notfilled').hide();
+	        checkRows();
+			checkColumns();
+			checkSectors();
+			if(!$('.error').hasClass('banana')) {
+				$('.completed').show();
+			}
+	    }				
+	});
+	//Row Checker function, fires the dupes(); function for all rows
+	var checkRows = function(sectionToCheck) {
+		$('.keyrow').each(function() {
+			var thisRow = $(this).attr('class').split(' ')[1];
+			var sectionToCheck = '.'+thisRow;
+			dupes(sectionToCheck);
+		});		
+	}
+	//Column Checker function, fires the dupes(); function for all columns
+	var checkColumns = function(sectionToCheck) {
+		$('.keycolumn').each(function() {
+			var thisColumn = $(this).attr('class').split(' ')[2];
+			var sectionToCheck = '.'+thisColumn;
+			dupes(sectionToCheck);
+		});	
+	}
+	//Sector Checker function, fires the dupes(); function for all sectors
+	var checkSectors = function(sectionToCheck) {
+		$('.keysector').each(function() {
+			var thisSector = $(this).attr('class').split(' ')[0];
+			var sectionToCheck = '.'+thisSector;
+			dupes(sectionToCheck);
+		});	
+	}
+	//This is the main function that looks for all dupes in columns, rows and sectors
+	var dupes = function(sectionToCheck) {
+		var sectionValues = [];
+		var sectionValues = $(sectionToCheck).map(function() {
+			return this.value;
+		}).get();
+		sectionValues = sectionValues.filter(Number);
+		function hasDuplicate(arr) {
+		    var i = arr.length, j, val;
+		
+		    while (i--) {
+		    	val = arr[i];
+		    	j = i;
+		    	while (j--) {
+		    		if (arr[j] === val) {
+		    			return true;
+		    		}
+		    	}
+		    }
+		    return false;
+		}
+		if (hasDuplicate(sectionValues)) {
+			$('.error').addClass('banana').show();
+			$('.ok').hide();
+			$('.completed').hide();
+			$(sectionToCheck).addClass('inerror');	
+			setTimeout( function() {
+				$(sectionToCheck).removeClass('inerror');
+				$('.error').removeClass('banana').fadeOut();			
+			}, 2000 );
+		} else {
+			if(!$('.error').hasClass('banana')) {
+				$('.ok').show();
+			}
+			setTimeout( function() {
+				$('.ok').fadeOut();			
+			}, 2000 );
+
+		}
+	}	
+});	
+	  
+                  </script>
+                  
+        
+        </body> 
+</html>
