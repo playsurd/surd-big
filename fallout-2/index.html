@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<base href="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/fallout-2/">
+<script>(function () {
+  var W = window;
+  var unityTarget = null;
+  function tellUnity(methods, arg) {
+    var inst = W.__surdUnity || W.unityInstance || W.gameInstance;
+    if (!inst || !inst.SendMessage || !unityTarget) return;
+    for (var i = 0; i < methods.length; i++) {
+      try { arg === undefined ? inst.SendMessage(unityTarget, methods[i]) : inst.SendMessage(unityTarget, methods[i], arg); }
+      catch (e) {  }
+    }
+  }
+  if (typeof W.initPokiBridge !== 'function') {
+    W.initPokiBridge = function (name) { unityTarget = name || unityTarget; };
+  }
+  if (typeof W.commercialBreak !== 'function') {
+    W.commercialBreak = function () { setTimeout(function () { tellUnity(['CommercialBreakComplete', 'commercialBreakComplete']); }, 0); };
+  }
+  if (typeof W.rewardedBreak !== 'function') {
+    W.rewardedBreak = function () { setTimeout(function () { tellUnity(['RewardedBreakComplete', 'rewardedBreakComplete'], 'false'); }, 0); };
+  }
+  var resolved = function () { return Promise.resolve(); };
+  if (!W.PokiSDK) {
+    W.PokiSDK = {
+      init: resolved, initPokiBridge: function () {}, setDebug: function () {},
+      gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
+      gameplayStart: function () {}, gameplayStop: function () {},
+      commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
+      happyTime: function () {}, customEvent: function () {}, captureError: function () {},
+      isAdBlocked: function () { return false; }, shareableURL: function () { return Promise.resolve(location.href); },
+      getURLParam: function (k) { try { return new URL(location.href).searchParams.get(k) || ''; } catch (e) { return ''; } },
+    };
+  }
+  if (!W.YaGames) {
+    var yPlayer = {
+      getName: function () { return 'player'; }, getUniqueID: function () { return 'local'; },
+      getData: function () { return Promise.resolve({}); }, setData: resolved,
+      getStats: function () { return Promise.resolve({}); }, setStats: resolved, incrementStats: resolved,
+      getMode: function () { return 'lite'; }, getPhoto: function () { return ''; },
+    };
+    var yLeaderboards = {
+      setLeaderboardScore: resolved,
+      getLeaderboardEntries: function () { return Promise.resolve({ entries: [] }); },
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardDescription: function () { return Promise.resolve({}); },
+    };
+    var ySdk = {
+      adv: {
+        showFullscreenAdv: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(false); }, 0); },
+        showRewardedVideo: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(); }, 0); },
+        getBannerAdvStatus: function () { return Promise.resolve({ stickyAdvIsShowing: false }); },
+      },
+      getPlayer: function () { return Promise.resolve(yPlayer); },
+      getPayments: function () { return Promise.resolve({
+        getCatalog: function () { return Promise.resolve([]); },
+        getPurchases: function () { return Promise.resolve([]); },
+        purchase: function () { return Promise.reject(new Error('payments unavailable')); },
+        consumePurchase: resolved,
+      }); },
+      getFlags: function () { return Promise.resolve({}); },
+      getStorage: function () { return Promise.resolve(window.localStorage); },
+      clipboard: { writeText: resolved },
+      shortcut: { canShowPrompt: function () { return Promise.resolve({ canShow: false }); }, showPrompt: function () { return Promise.resolve({ outcome: 'rejected' }); } },
+      feedback: { canReview: function () { return Promise.resolve({ value: false }); }, requestReview: function () { return Promise.resolve({ feedbackSent: false }); } },
+      getLeaderboards: function () { return Promise.resolve(yLeaderboards); },
+      features: { LoadingAPI: { ready: function () {} } },
+      screen: { fullscreen: { request: resolved, exit: resolved } },
+      isAvailableMethod: function () { return Promise.resolve(false); },
+      environment: { i18n: { lang: 'en' }, app: { id: 'local' } },
+      deviceInfo: { isDesktop: function () { return true; }, isMobile: function () { return false; },
+                    isTablet: function () { return false; }, isTV: function () { return false; },
+                    type: 'desktop' },
+    };
+    W.YaGames = { init: function () { return Promise.resolve(ySdk); } };
+    W.ysdk = ySdk;
+  }
+  if (!W.ytgame) {
+    var ytNoop = function () {};
+    W.ytgame = {
+      IN_PLAYABLES_ENV: false,
+      game: { firstFrameReady: ytNoop, gameReady: ytNoop, loadData: function () { return Promise.resolve(''); },
+              saveData: function () { return Promise.resolve(); }, isPaused: function () { return false; } },
+      system: { getLanguage: function () { return 'en'; }, isAudioEnabled: function () { return true; },
+                onAudioEnabledChange: ytNoop, onPause: ytNoop, onResume: ytNoop },
+      health: { logError: ytNoop, logWarning: ytNoop },
+      engagement: { sendScore: function () { return Promise.resolve(); } },
+      ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
+    };
+  }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
+  if (!W.GamePix) {
+    W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+                  interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
+  }
+  if (!W.CrazyGames) {
+    var noop = function () {};
+    W.CrazyGames = { SDK: {
+      init: resolved, game: { gameplayStart: noop, gameplayStop: noop, loadingStart: noop, loadingStop: noop, happytime: noop },
+      ad: { requestAd: function (t, cb) { if (cb && cb.adFinished) cb.adFinished(); }, hasAdblock: function () { return Promise.resolve(false); } },
+      user: { getUser: function () { return Promise.resolve(null); } },
+      banner: { requestBanner: resolved, clearAllBanners: noop },
+    } };
+  }
+})();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};
+window.alert=function(){};window.confirm=function(){return false;};window.prompt=function(){return null;};</script>
+<script>window.SURD_GAME={"id":"fallout-2","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/fallout-2/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{},"config":{}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shantell+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <title>Fallout 2</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: "Shantell Sans", sans-serif;
+    }
+
+    #viewport {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: block;
+    }
+
+    #canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #fff;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.9));
+      text-align: center;
+      padding: 20px;
+      transition: opacity 200ms ease;
+      z-index: 10;
+    }
+
+    #overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #logo {
+      max-width: min(420px, 82vw);
+      height: auto;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    #status {
+      font-size: 40px;
+      letter-spacing: 0.04em;
+      color: #cfd8dc;
+    }
+
+
+    #loading-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    #loading-footer img {
+      max-width: min(360px, 80vw);
+      height: auto;
+      display: block;
+    }
+  </style>
+<script>
+(function(){try{var m=(window.location.search||'').match(/[?&]__lp=([^&]+)/);var n=m?decodeURIComponent(m[1]):'';if(window.parent&&window.parent!==window){window.parent.postMessage({__lumin:'frame-ok',game:'truffled/fo2',nonce:n},'*');}}catch(e){}})();
+</script>
+<!-- Google tag (gtag.js) -->
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L69H1VNZ27');
+</script>
+<script>
+  window.__lumin_game_id = 'truffled/fo2';
+  console.log('[LuminSDK] Game loaded:', 'truffled/fo2');
+</script>
+
+</head>
+<body>
+  <div id="viewport">
+    <canvas id="canvas"></canvas>
+    <div id="overlay">
+      <img id="logo" src="assets/fo2.webp" alt="Fallout 2" />
+      <div id="status">loading game…</div>
+      <div id="loading-footer">
+        <img src="assets/portcred.png" alt="Port credit" />
+      </div>
+    </div>
+  </div>
+
+  <script crossorigin="anonymous" src="assets/emulators.js"></script>
+  <script crossorigin="anonymous" src="assets/indexdb.js"></script>
+  <script crossorigin="anonymous" src="assets/key.js"></script>
+  <script crossorigin="anonymous" src="assets/webgl.js"></script>
+  <script crossorigin="anonymous" src="assets/helper-x.js"></script>
+  <script crossorigin="anonymous" src="assets/audio-node.js"></script>
+  <script>
+    (function () {
+      var ci;
+
+      const overlay = document.getElementById("overlay");
+      const statusEl = document.getElementById("status");
+      const canvas = document.getElementById("canvas");
+      const assetBase = new URL(".", window.location.href).href;
+      const toolBase = assetBase.endsWith("/") ? assetBase.slice(0, -1) : assetBase;
+
+      const setStatus = (text) => {
+        statusEl.textContent = text;
+      };
+
+      const requestFullscreen = () => {
+        if (document.fullscreenElement) {
+          return;
+        }
+        const target = document.documentElement;
+        if (!target.requestFullscreen) {
+          return;
+        }
+        const promise = target.requestFullscreen();
+        if (promise && typeof promise.catch === "function") {
+          promise.catch(() => {});
+        }
+      };
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "F4") {
+          requestFullscreen();
+        }
+      });
+
+      requestFullscreen();
+
+      const fetchBundle = async (url) => {
+        setStatus("loading game bundle…");
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("failed to load bundle: " + response.status + " " + response.statusText);
+        }
+
+        const total = Number(response.headers.get("content-length")) || 0;
+        if (!response.body || !total) {
+          const buffer = await response.arrayBuffer();
+          return new Uint8Array(buffer);
+        }
+
+        const reader = response.body.getReader();
+        const chunks = [];
+        let loaded = 0;
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) {
+            break;
+          }
+          if (value) {
+            chunks.push(value);
+            loaded += value.length;
+            const percent = Math.min(100, Math.round((loaded / total) * 100));
+            setStatus("loading game bundle… " + percent + "%");
+          }
+        }
+
+        const blob = new Blob(chunks);
+        const buffer = await blob.arrayBuffer();
+        return new Uint8Array(buffer);
+      };
+
+      const startGame = async () => {
+        if (!window.emulators) {
+          throw new Error("emulator libs failed to load. check your network connection.");
+        }
+
+        emulators.pathPrefix = "assets/";
+
+        const bundle = await fetchBundle("assets/fallout2.jsdos");
+
+        const cdImages = [
+          {
+            link: toolBase + "/assets/disc/FALLOUT2.DCD",
+            name: "Fallout 2 Disc",
+            size: 671916128,
+            mount: "FALLOUT2.cue",
+          },
+        ];
+
+        let lastStage = null;
+        const stagePercent = Object.create(null);
+
+        const fallbackTotals = {
+          1: 45564835,
+          3: 491792,
+          5: 671916128,
+          7: 76901,
+        };
+
+        const helper = new HelperX(
+          bundle,
+          canvas,
+          {
+            name: "fallout2_cd",
+            save: 1,
+            mouseSensitivity: 0.6,
+            version: "20251209",
+          },
+          {
+            onReady: function () {
+              helper.Message(
+                "ddyx-settings",
+                {
+                  type: 1,
+                  baseurl: toolBase,
+                  option: "",
+                  voodoo_upscaler: false,
+                  voodoo_aniso: false,
+                  auto_command: undefined,
+                  hardware: {
+                    voodoo: false,
+                    tool: toolBase,
+                    mt32: false,
+                    gm: false,
+                    gmsf: "",
+                    cdImages: cdImages,
+                    selectedCD: 0,
+                    osImages: "/assets/os/WIN95OSR2_EN_OS.DCD",
+                    gameImages: "/assets/game/FALLOUT2.DCD",
+                  },
+                },
+                function () {
+                  setStatus("Starting game…");
+                  overlay.classList.add("hidden");
+                }
+              );
+            },
+            onProgress: function () {},
+            onFrameSize: function () {},
+            onExtractProgress: function (type, message, loaded, total) {
+              if (total) {
+                let stage = Number(type);
+                if (!Number.isFinite(stage)) {
+                  stage = parseInt(String(type), 10);
+                }
+                let effectiveTotal = total;
+                if (!effectiveTotal && Number.isFinite(stage) && fallbackTotals[stage]) {
+                  effectiveTotal = fallbackTotals[stage];
+                }
+                if (Number.isFinite(stage) && Number.isFinite(loaded) && effectiveTotal) {
+                  stagePercent[stage] = Math.min(100, Math.round((loaded / effectiveTotal) * 100));
+                }
+                const label = stage <= 1
+                  ? "preloading emulator… (1/2) "
+                  : stage >= 2 && stage <= 5
+                    ? "preloading emulator… (2/2) "
+                    : stage >= 6
+                      ? "loading game files… "
+                      : "loading emulator… ";
+                const percent = stagePercent[stage] ?? 0;
+                setStatus(label + percent + "%");
+                lastStage = Number.isFinite(stage) ? stage : lastStage;
+              } else if (message || loaded) {
+                let stage = Number(type);
+                if (!Number.isFinite(stage)) {
+                  stage = parseInt(String(type), 10);
+                }
+                let effectiveTotal = total;
+                if (!effectiveTotal && Number.isFinite(stage) && fallbackTotals[stage]) {
+                  effectiveTotal = fallbackTotals[stage];
+                }
+                if (Number.isFinite(stage) && Number.isFinite(loaded) && effectiveTotal) {
+                  stagePercent[stage] = Math.min(100, Math.round((loaded / effectiveTotal) * 100));
+                }
+                const label = stage <= 1
+                  ? "preloading emulator… (1/2) "
+                  : stage >= 2 && stage <= 5
+                    ? "preloading emulator… (2/2) "
+                    : stage >= 6
+                      ? "loading game files… "
+                      : "loading emulator… ";
+                const percent = stagePercent[stage];
+                if (Number.isFinite(stage) && percent !== undefined) {
+                  setStatus(label + percent + "%");
+                } else {
+                  setStatus(label + "100%");
+                }
+                lastStage = Number.isFinite(stage) ? stage : lastStage;
+              } else {
+                let stage = Number(type);
+                if (!Number.isFinite(stage)) {
+                  stage = parseInt(String(type), 10);
+                }
+                if (Number.isFinite(stage) && stage !== lastStage) {
+                  const label = stage <= 1
+                    ? "preloading emulator… (1/2)"
+                    : stage >= 2 && stage <= 5
+                      ? "preloading emulator… (2/2)"
+                      : stage >= 6
+                        ? "loading game files…"
+                        : "loading emulator…";
+                  const percent = stagePercent[stage];
+                  if (percent !== undefined) {
+                    setStatus(label + " " + percent + "%");
+                  } else {
+                    setStatus(label + " 100%");
+                  }
+                  lastStage = stage;
+                }
+              }
+            },
+          }
+        );
+      };
+
+      startGame().catch((error) => {
+        console.error(error);
+        overlay.classList.remove("hidden");
+        setStatus(error.message || "failed to start game. check console for details!");
+      });
+    })();
+  </script>
+</body>
+</html>
