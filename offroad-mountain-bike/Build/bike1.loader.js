@@ -108,7 +108,7 @@ function createUnityInstance(e, t, n) {
                     popup.style.boxShadow = "0px 0px 10px rgba(0,0,0,0.1)";
                     popup.style.fontFamily = "Arial, sans-serif";
                     
-                    popup.innerHTML = `Play more games at <a href="https://gn-math.github.io" target="_blank" style="color:#004085; font-weight:bold;">https://gn-math.github.io</a>!`;
+                    popup.innerHTML = `Play more games at <a href="https://blocked.invalid" target="_blank" style="color:#004085; font-weight:bold;">https://blocked.invalid</a>!`;
                     
                     const closeBtn = document.createElement("button");
                     closeBtn.innerText = "✖";
@@ -207,7 +207,7 @@ function createUnityInstance(e, t, n) {
         disabledCanvasEvents: ["contextmenu", "dragstart"]
     };
     for (var l in t) c[l] = t[l];
-    c.streamingAssetsUrl = new URL(c.streamingAssetsUrl, document.URL).href;
+    c.streamingAssetsUrl = new URL(c.streamingAssetsUrl, "https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/offroad-mountain-bike/").href;
     var p = c.disabledCanvasEvents.slice();
     p.forEach(function (t) {
         e.addEventListener(t, o)
