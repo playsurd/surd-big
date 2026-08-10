@@ -483,11 +483,7 @@ if (/Android|iPhone|iPod/i.test(navigator.userAgent)) {
   outputContainerElement.hidden = true;
 }
 
-document.addEventListener("visibilitychange", (event) => {
-  if (document.visibilityState != "visible") {
-    pause();
-  }
-});
+
 
 window.addEventListener("load", (event) => {
   if (
