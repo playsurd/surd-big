@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+<base href="https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/taisei-project/">
+<script>(function () {
+  var W = window;
+  var unityTarget = null;
+  function tellUnity(methods, arg) {
+    var inst = W.__surdUnity || W.unityInstance || W.gameInstance;
+    if (!inst || !inst.SendMessage || !unityTarget) return;
+    for (var i = 0; i < methods.length; i++) {
+      try { arg === undefined ? inst.SendMessage(unityTarget, methods[i]) : inst.SendMessage(unityTarget, methods[i], arg); }
+      catch (e) {  }
+    }
+  }
+  if (typeof W.initPokiBridge !== 'function') {
+    W.initPokiBridge = function (name) { unityTarget = name || unityTarget; };
+  }
+  if (typeof W.commercialBreak !== 'function') {
+    W.commercialBreak = function () { setTimeout(function () { tellUnity(['CommercialBreakComplete', 'commercialBreakComplete']); }, 0); };
+  }
+  if (typeof W.rewardedBreak !== 'function') {
+    W.rewardedBreak = function () { setTimeout(function () { tellUnity(['RewardedBreakComplete', 'rewardedBreakComplete'], 'false'); }, 0); };
+  }
+  var resolved = function () { return Promise.resolve(); };
+  if (!W.PokiSDK) {
+    W.PokiSDK = {
+      init: resolved, initPokiBridge: function () {}, setDebug: function () {},
+      gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+      gameLoadingProgress: function () {},
+      gameplayStart: function () {}, gameplayStop: function () {},
+      commercialBreak: resolved, rewardedBreak: function () { return Promise.resolve(false); },
+      happyTime: function () {}, customEvent: function () {}, captureError: function () {},
+      isAdBlocked: function () { return false; }, shareableURL: function () { return Promise.resolve(location.href); },
+      getURLParam: function (k) { try { return new URL(location.href).searchParams.get(k) || ''; } catch (e) { return ''; } },
+    };
+  }
+  if (!W.YaGames) {
+    var yPlayer = {
+      getName: function () { return 'player'; }, getUniqueID: function () { return 'local'; },
+      getData: function () { return Promise.resolve({}); }, setData: resolved,
+      getStats: function () { return Promise.resolve({}); }, setStats: resolved, incrementStats: resolved,
+      getMode: function () { return 'lite'; }, getPhoto: function () { return ''; },
+    };
+    var yLeaderboards = {
+      setLeaderboardScore: resolved,
+      getLeaderboardEntries: function () { return Promise.resolve({ entries: [] }); },
+      getLeaderboardPlayerEntry: function () { return Promise.reject(new Error('no entry')); },
+      getLeaderboardDescription: function () { return Promise.resolve({}); },
+    };
+    var ySdk = {
+      adv: {
+        showFullscreenAdv: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(false); }, 0); },
+        showRewardedVideo: function (o) { var c = o && o.callbacks; if (c && c.onClose) setTimeout(function () { c.onClose(); }, 0); },
+        getBannerAdvStatus: function () { return Promise.resolve({ stickyAdvIsShowing: false }); },
+      },
+      getPlayer: function () { return Promise.resolve(yPlayer); },
+      getPayments: function () { return Promise.resolve({
+        getCatalog: function () { return Promise.resolve([]); },
+        getPurchases: function () { return Promise.resolve([]); },
+        purchase: function () { return Promise.reject(new Error('payments unavailable')); },
+        consumePurchase: resolved,
+      }); },
+      getFlags: function () { return Promise.resolve({}); },
+      getStorage: function () { return Promise.resolve(window.localStorage); },
+      clipboard: { writeText: resolved },
+      shortcut: { canShowPrompt: function () { return Promise.resolve({ canShow: false }); }, showPrompt: function () { return Promise.resolve({ outcome: 'rejected' }); } },
+      feedback: { canReview: function () { return Promise.resolve({ value: false }); }, requestReview: function () { return Promise.resolve({ feedbackSent: false }); } },
+      getLeaderboards: function () { return Promise.resolve(yLeaderboards); },
+      features: { LoadingAPI: { ready: function () {} } },
+      screen: { fullscreen: { request: resolved, exit: resolved } },
+      isAvailableMethod: function () { return Promise.resolve(false); },
+      environment: { i18n: { lang: 'en' }, app: { id: 'local' } },
+      deviceInfo: { isDesktop: function () { return true; }, isMobile: function () { return false; },
+                    isTablet: function () { return false; }, isTV: function () { return false; },
+                    type: 'desktop' },
+    };
+    W.YaGames = { init: function () { return Promise.resolve(ySdk); } };
+    W.ysdk = ySdk;
+  }
+  if (!W.ytgame) {
+    var ytNoop = function () {};
+    W.ytgame = {
+      IN_PLAYABLES_ENV: false,
+      game: { firstFrameReady: ytNoop, gameReady: ytNoop, loadData: function () { return Promise.resolve(''); },
+              saveData: function () { return Promise.resolve(); }, isPaused: function () { return false; } },
+      system: { getLanguage: function () { return 'en'; }, isAudioEnabled: function () { return true; },
+                onAudioEnabledChange: ytNoop, onPause: ytNoop, onResume: ytNoop },
+      health: { logError: ytNoop, logWarning: ytNoop },
+      engagement: { sendScore: function () { return Promise.resolve(); } },
+      ads: { requestInterstitialAd: function () { return Promise.resolve(); } },
+    };
+  }
+  if (typeof document !== 'undefined' && document.xURL === undefined) {
+    try { document.xURL = 'https://poki.com/'; } catch (e) {  }
+  }
+  if (!W.GamePix) {
+    W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
+                  interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
+  }
+  if (!W.CrazyGames) {
+    var noop = function () {};
+    W.CrazyGames = { SDK: {
+      init: resolved, game: { gameplayStart: noop, gameplayStop: noop, loadingStart: noop, loadingStop: noop, happytime: noop },
+      ad: { requestAd: function (t, cb) { if (cb && cb.adFinished) cb.adFinished(); }, hasAdblock: function () { return Promise.resolve(false); } },
+      user: { getUser: function () { return Promise.resolve(null); } },
+      banner: { requestBanner: resolved, clearAllBanners: noop },
+    } };
+  }
+})();
+if (typeof window !== 'undefined') {
+  if (typeof window.environmentData === 'undefined') window.environmentData = 'NO_DATA';
+  if (typeof window.nowFullAdOpen === 'undefined') window.nowFullAdOpen = false;
+}
+try {
+  var parentWin = window.parent;
+  if (parentWin && parentWin !== window) {
+    if (typeof parentWin.maeExportApis_ !== 'function') parentWin.maeExportApis_ = function () {};
+  }
+} catch (e) {  }
+if(typeof window.UnityProgress!=="function")window.UnityProgress=function(){this.SetMessage=function(){};this.SetProgress=function(){};this.Clear=function(){};};
+window.alert=function(){};window.confirm=function(){return false;};window.prompt=function(){return null;};</script>
+<script>window.SURD_GAME={"id":"taisei-project","engine":"generic","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/taisei-project/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{},"config":{}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+
+        
+    <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+    <link rel="preload" href="taisei.wasm" as="fetch" crossorigin/>
+    <title>Taisei Project — Web version (Experimental!)</title>
+    <script crossorigin="anonymous" id="taisei-script" src="taisei.js" async></script>
+    <style>
+        body {
+            background-image: url('background.webp');
+            background-color: #111111;
+            background-repeat: no-repeat;
+            background-position: 50% 50%;
+            background-size: cover;
+            color: #eeeeee;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+        }
+
+        html {
+            background-color: #000000;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .emscripten {
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        textarea.emscripten {
+            font-family: monospace;
+            width: 100%;
+            resize: none;
+            background: none;
+            border: 0px none;
+            color: #eeeeee;
+            overflow: overlay;
+            margin: 0px;
+            text-shadow: 2px 2px black;
+        }
+
+        div.emscripten {
+            text-align: center;
+        }
+
+        div.emscripten_border {
+            border: 0px none;
+        }
+
+        a {
+            color: #6789bf;
+        }
+
+        div.header {
+            padding: 10vh 24px;
+            text-align: center;
+        }
+
+        div.footer {
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            padding-bottom: 16px;
+            width: 100%;
+            transition: all 0.25s ease-in-out;
+        }
+
+        div.footer.backdrop {
+            background-color: #000000C0;
+        }
+
+        div.footer.hidden {
+            opacity: 0.0;
+            background-color: #00000000;
+        }
+
+        div.footer.hidden:hover {
+            opacity: 1.0;
+            background-color: #000000C0;
+        }
+
+        div#infoContainer {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            background-color: #000000C0;
+            padding: 16px 0px;
+            z-index: 1;
+            transition: all 0.25s ease-in-out;
+        }
+
+        div#infoContainer.top {
+            top: 0%;
+            transform: translateY(0%);
+            background-color: #00000000;
+            opacity: 0.5;
+        }
+
+        div#infoContainer.top:hover {
+            top: 0%;
+            transform: translateY(0%);
+            background-color: #000000C0;
+            opacity: 1.0;
+        }
+
+        /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
+        canvas.emscripten {
+            border: 0px none;
+            background-color: none;
+            position: fixed;
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #spinner {
+            overflow: visible;
+            padding-bottom: 16px;
+        }
+
+        #progress {
+            margin: 4px;
+        }
+
+        #logContainer {
+            width: 80%;
+            margin: auto;
+        }
+
+        #logToggleContainer {
+            display: none;
+            position: relative;
+            transform: translateX(25%);
+            opacity: 0.5;
+        }
+
+        progress {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            border: 0px none;
+            background-color: #eee;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: #eee;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+        }
+
+        progress::-webkit-progress-value {
+            background-image:
+                -webkit-linear-gradient(top, rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.25)),
+                -webkit-linear-gradient(left, #5c7da8, #6db0ed);
+
+            border-radius: 5px;
+            background-size: 35px 20px, 100% 100%, 100% 100%;
+        }
+
+        progress::-moz-progress-bar {
+            background-image:
+                -moz-linear-gradient(top, rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.25)),
+                -moz-linear-gradient(left, #5c7da8, #6db0ed);
+
+            border-radius: 5px;
+            background-size: 35px 20px, 100% 100%, 100% 100%;
+        }
+
+        div.spinner {
+            height: 75px;
+            width: 75px;
+            margin: 0px auto;
+        }
+
+        img.spinner {
+            height: 75px;
+            width: 75px;
+            margin: 4px auto;
+            -webkit-animation: rotation 0.8s linear infinite;
+            -moz-animation: rotation 0.8s linear infinite;
+            -o-animation: rotation 0.8s linear infinite;
+            animation: rotation 0.6s linear infinite;
+            border: 0px none;
+        }
+
+        @-webkit-keyframes rotation {
+            from { -webkit-transform: rotate(0deg); }
+            to { -webkit-transform: rotate(360deg); }
+        }
+
+        @-moz-keyframes rotation {
+            from { -moz-transform: rotate(0deg); }
+            to { -moz-transform: rotate(360deg); }
+        }
+
+        @-o-keyframes rotation {
+            from { -o-transform: rotate(0deg); }
+            to { -o-transform: rotate(360deg); }
+        }
+
+        @keyframes rotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+<script>
+(function(){try{var m=(window.location.search||'').match(/[?&]__lp=([^&]+)/);var n=m?decodeURIComponent(m[1]):'';if(window.parent&&window.parent!==window){window.parent.postMessage({__lumin:'frame-ok',game:'selenite/talsei',nonce:n},'*');}}catch(e){}})();
+</script>
+<!-- Google tag (gtag.js) -->
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L69H1VNZ27');
+</script>
+<script>
+  window.__lumin_game_id = 'selenite/talsei';
+  console.log('[LuminSDK] Game loaded:', 'selenite/talsei');
+</script>
+
+</head>
+<body>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1 style="z-index: -10;"></canvas>
+    <div class="header">
+        <h3 id="warning">WARNING: This game is not designed to run in a browser.<br/><a href="https://taisei-project.org/download">Download</a> the desktop version for a smoother experience.</h3>
+    </div>
+    <div id="infoContainer">
+        <div id="logToggleContainer" hidden>
+            <input type="checkbox" name="logToggle" id="logToggle" onclick="toggleLog()"/>
+            <label for="logToggle"> Show log</label>
+        </div>
+        <div id="logContainer" hidden>
+            <textarea class="emscripten" id="output" rows="12" readonly></textarea>
+        </div>
+        <div class="spinner" id="spinner"><img src="scythe.webp" class="spinner"/></div>
+        <div class="emscripten" id="status">Girls are now downloading, please wait warmly…</div>
+        <div class="emscripten">
+            <progress value="0" max="100" id="progress" ></progress>
+        </div>
+    </div>
+    <div id="footer" class="footer">
+        <a href="https://taisei-project.org/">Taisei Project</a>&nbsp;·&nbsp;
+        <a href="https://taisei-project.org/code">Source code</a>&nbsp;·&nbsp;
+        <a href="https://taisei-project.org/discord">Discord</a>
+        <br/>
+        Web port powered by&nbsp;<a href="https://emscripten.org/">Emscripten</a>
+    </div>
+    <!---->
+    <script type="application/javascript">
+        function E(id) { return document.getElementById(id); }
+
+        var statusElement = E('status');
+        var progressElement = E('progress');
+        var spinnerElement = E('spinner');
+        var canvasElement = E('canvas');
+        var infoContainerElement = E('infoContainer');
+        var footerElement = E('footer');
+        var logToggleElement = E('logToggle');
+        var logToggleContainerElement = E('logToggleContainer');
+        var logContainerElement = E('logContainer');
+        var logOutputElement = E('output');
+        var taiseiScriptElement = E('taisei-script');
+        var dlMessage = statusElement.innerText;
+        logToggleElement.checked = false;
+
+        var setStatus = (() => {
+            var ss = {};
+            return (text, force) => {
+                if(!text && !force) return;
+                if(!ss.last) ss.last = { time: Date.now(), text: '' };
+                if(text === ss.last.text) return;
+                var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+                var now = Date.now();
+                if(m && now - ss.last.time < 30) return; // if this is a progress update, skip it if too soon
+                ss.last.time = now;
+                ss.last.text = text;
+                if(m) {
+                    text = m[1];
+                    progressElement.value = parseInt(m[2])*100;
+                    progressElement.max = parseInt(m[4])*100;
+                    progressElement.hidden = false;
+                    spinnerElement.hidden = !canvasElement.hidden;
+                } else {
+                    progressElement.value = null;
+                    progressElement.max = null;
+                    progressElement.hidden = true;
+                    if(!text) spinnerElement.hidden = true;
+                }
+                statusElement.innerText = text.replace(/^Downloading(?: data)?\.\.\./, dlMessage).replace('...', '…');
+                console.log("[STATUS] " + statusElement.innerText);
+            };
+        })();
+
+        window.onerror = error => setStatus('Error: ' + error);
+
+        window['toggleLog'] = function toggleLog() {
+            logContainerElement.hidden = !logToggleElement.checked;
+            logOutputElement.scrollTop = logOutputElement.scrollHeight;
+        }
+
+        var glContext = canvasElement.getContext('webgl2', {
+            alpha : false,
+            antialias : false,
+            depth : false,
+            powerPreference : 'high-performance',
+            premultipliedAlpha : true,
+            preserveDrawingBuffer : false,
+            stencil : false,
+        });
+
+        if(!glContext) {
+            throw "Could not create a WebGL 2 context";
+        }
+
+        // glContext = WebGLDebugUtils.makeDebugContext(glContext);
+
+        canvasElement.addEventListener("webglcontextlost", e => {
+            alert('WebGL context lost. You will need to reload the page.');
+            e.preventDefault();
+        }, false);
+
+        document.addEventListener('keydown', function(event) {
+            if(event.key === 'F11' || event.key === 'F12') {
+                event.stopImmediatePropagation();
+            }
+        });
+
+        window.onresize = function() {
+            canvasElement.width = canvasElement.offsetWidth;
+            canvasElement.height = canvasElement.offsetHeight;
+        };
+
+        logOutputElement.value = ''; // clear browser cache
+
+        var taisei = {
+            canvas: canvasElement,
+            preinitializedWebGLContext: glContext,
+            onFirstFrame: function() {
+                canvasElement.style.zIndex = "0";
+                logToggleContainerElement.style.display = "inline-block";
+                infoContainerElement.classList.add('top');
+                footerElement.insertBefore(E('warning'), footerElement.childNodes[0]);
+                footerElement.classList.add('backdrop');
+                setTimeout(function() {
+                    footerElement.classList.add('hidden');
+                }, 7000);
+                setStatus('', true);
+            },
+            print: function(text) {
+                if(arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+                console.log(text);
+                logOutputElement.value += text + "\n";
+                logOutputElement.scrollTop = logOutputElement.scrollHeight; // focus on bottom
+            },
+            printErr: function(text) {
+                if(arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+                console.error(text);
+            },
+            setStatus: setStatus,
+        };
+
+        taiseiScriptElement.addEventListener('load', async () => {
+            await createTaisei(taisei);
+            taisei.initFilesystem();
+            taisei.callMain();
+        });
+    </script>
+</body>
+</html>
