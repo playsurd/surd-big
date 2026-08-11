@@ -91,6 +91,24 @@
   if (typeof document !== 'undefined' && document.xURL === undefined) {
     try { document.xURL = 'https://poki.com/'; } catch (e) {  }
   }
+  if (!W.YYGGames) {
+    var yyAds = function (o) {
+      o = o || {};
+      var step = function (fn) { if (typeof fn === 'function') setTimeout(fn, 0); };
+      step(o.beforeShowAd);
+      setTimeout(function () { step(o.afterShowAd); step(o.rewardDismissed); }, 1);
+    };
+    W.YYGGames = {
+      startup: function (o) { if (o && typeof o.complete === 'function') setTimeout(o.complete, 0); },
+      startupByYad: function () {}, showSplash: function () {},
+      showInterstitial: yyAds, showReward: yyAds,
+      canShowReward: function () { return false; },
+      getAdPlatformType: function () { return 'none'; },
+      getForgames: function () { return Promise.resolve([]); },
+      navigate: function () {},
+      onVisibilitychange: function () {},
+    };
+  }
   if (!W.GamePix) {
     W.GamePix = { init: function () {}, ping: function () {}, gameLoadingStart: function () {}, gameLoadingFinished: function () {},
                   interstitialAd: resolved, rewardAd: function () { return Promise.resolve(false); }, happyMoment: function () {} };
@@ -998,6 +1016,6 @@ function GetFlags() {
 
         document.body.appendChild(script);
     </script><script>window.createUnityInstance=window.__surdBoot.cui;window.UnityLoader=window.__surdBoot.ul;window.Engine=window.__surdBoot.en;window.RufflePlayer=window.__surdBoot.rp;delete window.godotRunStart;</script>
-<script>window.SURD_GAME = {"id":"camouflage-and-sniper","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/camouflage-and-sniper/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/","files":{"data":{"path":"Build/5aa7c229e9057bcb9347d42bcd12a891.data.unityweb","parts":[".sp0",".sp1",".sp2",".sp3",".sp4",".sp5"],"bytes":101068277,"mime":"application/octet-stream"},"framework":{"path":"Build/dc23378ecca25259518439c29c11ead1.js.unityweb","bytes":625157,"mime":"text/javascript"},"code":{"path":"Build/16cb652043a654e1a894e2ee93022d1a.wasm.unityweb","parts":[".sp0",".sp1"],"bytes":19729989,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/CamoSniper_YG.loader.js","companyName":"Cool Games","productName":"CamoSniper","productVersion":"0.1"}};</script>
-<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/vae8e0b73b4/runtime.js"></script>
+<script>window.SURD_GAME = {"id":"camouflage-and-sniper","engine":"unity","base":"https://cdn.jsdelivr.net/gh/playsurd/surd-big@main/camouflage-and-sniper/","runtime":"https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/va41e0dbc95/","files":{"data":{"path":"Build/5aa7c229e9057bcb9347d42bcd12a891.data.unityweb","parts":[".sp0",".sp1",".sp2",".sp3",".sp4",".sp5"],"bytes":101068277,"mime":"application/octet-stream"},"framework":{"path":"Build/dc23378ecca25259518439c29c11ead1.js.unityweb","bytes":625157,"mime":"text/javascript"},"code":{"path":"Build/16cb652043a654e1a894e2ee93022d1a.wasm.unityweb","parts":[".sp0",".sp1"],"bytes":19729989,"mime":"application/wasm"}},"config":{"era":"modern","loaderJs":"Build/CamoSniper_YG.loader.js","companyName":"Cool Games","productName":"CamoSniper","productVersion":"0.1"}};</script>
+<script crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/playsurd/surd-runtime@main/va41e0dbc95/runtime.js"></script>
 </body></html>
