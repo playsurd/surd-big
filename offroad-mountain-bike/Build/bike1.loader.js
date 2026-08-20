@@ -133,7 +133,7 @@ function createUnityInstance(e, t, n) {
                 type: "application/javascript"
             }));
             return new Promise(function (e, n) {
-                var r = document.create("script");
+                var r = document.createElement("script");
                 r.src = t, r.onload = function () {
                     var n = unityFramework;
                     unityFramework = null, r.onload = null, URL.revokeObjectURL(t), e(n)
